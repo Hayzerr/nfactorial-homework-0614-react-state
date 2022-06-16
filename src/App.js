@@ -33,7 +33,7 @@ const toDoItems = [
     label: "Generate Value",
   },
 ];
-
+let cntj = 0;
 // helpful links:
 // useState crash => https://blog.logrocket.com/a-guide-to-usestate-in-react-ecb9952e406c/
 function App() {
@@ -42,11 +42,13 @@ function App() {
   const [searchTerm, setsearchTerm] = useState("");
   //arrow declaration => expensive computation ex: API calls
   const [items, setItems] = useState(() =>{
-    
   const localData = localStorage.getItem("list");
   return localData ? JSON.parse(localData) : toDoItems;
   });
-
+  const [cnt, setCnt] = useState(() =>{
+    const localData = localStorage.getItem("number");
+    return localData ? JSON.parse(localData) : parseInt(0);
+  });
   const [filterType, setFilterType] = useState("");
 
   const handleChangeItem = (event) => {
@@ -59,11 +61,15 @@ function App() {
     // setItems(oldItems);
 
     // not mutating !CORRECT!
+    if(itemToAdd == ""){
+        console.log(1);
+    }
+    else{
     setItems((prevItems) => [
       { label: itemToAdd, key: uuidv4() },
       ...prevItems,
     ]);
-
+  }
     setItemToAdd("");
   };
 
@@ -108,8 +114,9 @@ function App() {
     setFilterType(type);
   };
   const DeleteItem = (item) => {
-      item.label = "";
-      Addimportant(item);
+    setCnt(cnt+1);
+    item.label = '';
+    Addimportant(item);
   };
   const amountDone = items.filter((item) => item.done).length;
 
@@ -124,14 +131,16 @@ function App() {
   useEffect(() => {
     localStorage.setItem("list", JSON.stringify(items));
   },[items]);
-    
+  useEffect(() =>{
+    localStorage.setItem("number", JSON.stringify(cnt));
+  }, [cnt]);
   return (
     <div className="todo-app">
       {/* App-header */}
       <div className="app-header d-flex">
         <h1>Todo List</h1>
         <h2>
-          {amountLeft} more to do, {amountDone} done
+          {parseInt(amountLeft) - cnt} more to do, {amountDone} done
         </h2>
       </div>
 
@@ -180,7 +189,7 @@ function App() {
                 <span
                   className="todo-list-item-label"
                   onClick={() => handleItemDone(item)}
-                >
+                  >
                   {item.label}
                 </span>
 
